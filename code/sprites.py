@@ -95,7 +95,22 @@ class Enemy(pygame.sprite.Sprite):
         enemy_pos = pygame.Vector2(self.rect.center)
         self.enemy_dir = (player_pos - enemy_pos).normalize()
 
-        self.rect.center += self.enemy_dir * self.speed * delta_t
+        self.hitbox_rect.x += self.enemy_dir.x * self.speed * delta_t
+        self.collisions('horizontal')
+        self.hitbox_rect.y += self.enemy_dir.y * self.speed * delta_t
+        self.collisions('vertical')
+        self.rect.center = self.hitbox_rect.center
+
+
+    def collisions(self, direction):
+        for sprite in self.collision_sprites:
+            if sprite.rect.colliderect(self.hitbox_rect):
+                if direction == ' horizontal':
+                    if self.enemy_dir.x > 0: self.hitbox_rect.right = sprite.rect.left
+                    if self.enemy_dir.x < 0: self.hitbox_rect.left = sprite.rect.right
+                else:
+                    if self.enemy_dir.y < 0: self.hitbox_rect.top = sprite.rect.bottom
+                    if self.enemy_dir.y > 0: self.hitbox_rect.bottom = sprite.rect.top
 
 
     def update(self, dt):
