@@ -1,8 +1,9 @@
 from math import atan2, degrees
+
 import pygame.sprite
-from pygame.display import update
 
 from settings import *
+
 
 class Sprite(pygame.sprite.Sprite):
     def __init__(self, pos, surf, groups):
@@ -53,11 +54,11 @@ class Gun(pygame.sprite.Sprite):
 
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, surf, pos, dir, groups):
+    def __init__(self, surf, pos, direction, groups):
         super().__init__(groups)
         self.image = surf
         self.rect = self.image.get_frect(center=pos)
-        self.bullet_dir = dir
+        self.bullet_dir = direction
         self.speed = 1200
         self.spawn_time = pygame.time.get_ticks()
         self.lifetime = 1000
@@ -74,11 +75,29 @@ class Enemy(pygame.sprite.Sprite):
         self.player = player
 
         self.frames, self.frame_index = frames, 0
-        self.images = self.frames[self.frame_index]
+        self.image = self.frames[self.frame_index]
         self.animation_speed = 6
 
         self.rect = self.image.get_frect(center=pos)
         self.hitbox_rect = self.rect.inflate(-20, -40)
         self.collision_sprites = collision_sprites
-        self.enemy_dir = pygame.Vector(2)
+        self.enemy_dir = pygame.Vector2()
         self.speed = 300
+
+
+    def animate(self, delta_t):
+        self.frame_index += self.animation_speed * delta_t
+        self.image = self.frames[int(self.frame_index) % len(self.frames)]
+
+
+    def move(self, delta_t):
+        player_pos = pygame.Vector2(self.player.rect.center)
+        enemy_pos = pygame.Vector2(self.rect.center)
+        self.enemy_dir = (player_pos - enemy_pos).normalize()
+
+        self.rect.center += self.enemy_dir * self.speed * delta_t
+
+
+    def update(self, dt):
+        self.move(dt)
+        self.animate(dt)
