@@ -1,0 +1,2 @@
+20.09.2024 - Added healthy spam functionality. Now enemies won't spam if the distance between
+Player position and Enemy position is below 300. This will help with the game convenience.

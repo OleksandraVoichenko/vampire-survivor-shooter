@@ -74,6 +74,13 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__(groups)
         self.player = player
 
+        self.player_pos = pygame.Vector2(self.player.rect.center)
+        self.enemy_pos = pygame.Vector2(pos)
+
+        if (self.player_pos - self.enemy_pos).length() <= 300:
+            self.kill()
+            return
+
         self.frames, self.frame_index = frames, 0
         self.image = self.frames[self.frame_index]
         self.animation_speed = 6
